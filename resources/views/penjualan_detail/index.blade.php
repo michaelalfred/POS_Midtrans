@@ -78,7 +78,7 @@
                         <div class="tampil-terbilang"></div>
                     </div>
                     <div class="col-lg-4">
-                        <form action="{{ route('transaksi.simpan') }}" class="form-penjualan" method="post">
+                        <form action="{{ route('transaksi.proses') }}" class="form-penjualan" method="post">
                             @csrf
                             <input type="hidden" name="id_penjualan" value="{{ $id_penjualan }}">
                             <input type="hidden" name="total" id="total">
@@ -117,19 +117,13 @@
                                     <input type="text" id="bayarrp" class="form-control" readonly>
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <label for="kembali" class="col-lg-2 control-label">Kembali</label>
-                                <div class="col-lg-8">
-                                    <input type="text" id="kembali" name="kembali" class="form-control" value="0" readonly>
-                                </div>
-                            </div>
                         </form>
                     </div>
                 </div>
             </div>
 
             <div class="box-footer">
-                <button type="submit" class="btn btn-primary btn-sm btn-flat pull-right btn-simpan"><i class="fa fa-floppy-o"></i> Simpan Transaksi</button>
+                <button type="submit" class="btn btn-primary btn-sm btn-flat pull-right btn-simpan" id="pay-button"><i class="fa fa-floppy-o"></i> Bayar</button>
             </div>
         </div>
     </div>
@@ -140,7 +134,8 @@
 @endsection
 
 @push('scripts')
-<script>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{env('MIDTRANS_CLIENT_KEY')}}"></script>
+<script type="text/javascript">
     let table, table2;
 
     $(function () {
@@ -302,8 +297,8 @@
 
                 $('#kembali').val('Rp.'+ response.kembalirp);
                 if ($('#diterima').val() != 0) {
-                    $('.tampil-bayar').text('Kembali: Rp. '+ response.kembalirp);
-                    $('.tampil-terbilang').text(response.kembali_terbilang);
+                    $('.tampil-bayar').text('Total: Rp. '+ response.bayarrp);
+                    $('.tampil-terbilang').text(response.tampil-terbilang);
                 }
             })
             .fail(errors => {

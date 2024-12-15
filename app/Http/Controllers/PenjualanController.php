@@ -7,6 +7,8 @@ use App\Models\PenjualanDetail;
 use App\Models\Produk;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use \Illuminate\Support\Facades\Log;
 use PDF;
 
 class PenjualanController extends Controller
@@ -120,6 +122,65 @@ class PenjualanController extends Controller
             ->rawColumns(['kode_produk'])
             ->make(true);
     }
+
+    public function process(Request $request)
+    {
+        $data = $request->all();
+
+        $transaction = Penjualan::create([
+            'id_member' => $data['id_member'],
+            'total_item' => $data['total_item'],
+            'total_harga' => $data['total'],
+            'diskon' => $data['diskon'],
+            'bayar' => $data['bayar'],
+            'id_user' => Auth::user()->id,
+            'status' => 'pending',
+        ]);
+
+        // Set your Merchant Server Key
+        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
+        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+        \Midtrans\Config::$isProduction = false;
+        // Set sanitization on (default)
+        \Midtrans\Config::$isSanitized = true;
+        // Set 3DS transaction for credit card to true
+        \Midtrans\Config::$is3ds = true;
+
+        $params = array(
+            'transaction_details' => array(
+                'order_id' => rand(),
+                'gross_amount' => $data['bayar'],
+            ),
+            'customer_details' => array(
+                'first_name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+            )
+        );
+
+        $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+        $transaction->snap_token = $snapToken;
+        $transaction->save();
+
+        return redirect()->route('checkout', $transaction->id_penjualan);
+    }
+
+    public function checkout(Penjualan $transaction)
+    {
+        // Debug isi $transaction
+        Log::info('Transaction Data: ', $transaction->toArray());
+
+        return view('penjualan.checkout', compact('transaction'));
+    }
+
+    public function success(Penjualan $transaction){
+        $transaction->status = 'success';
+        $transaction->save();
+
+        return redirect()->route('transaksi.baru');
+    }
+
+
 
     public function destroy($id)
     {
