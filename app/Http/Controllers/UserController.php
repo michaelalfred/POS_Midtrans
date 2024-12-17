@@ -154,4 +154,8 @@ class UserController extends Controller
 
         return response()->json($user, 200);
     }
+
+    function getCsrf(){
+        return csrf_token();
+    }
 }

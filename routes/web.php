@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('login');
 });
+Route::get('/csrf', [UserController::class, 'csrf'])->name('csrf');
 
 Route::post('/user/store', [UserController::class, 'store'])->name('user.store');
 

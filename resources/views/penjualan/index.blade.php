@@ -7,6 +7,26 @@
 @section('breadcrumb')
     @parent
     <li class="active">Daftar Penjualan</li>
+    <style>
+        .badge {
+            padding: 0.5em 0.75em;
+            font-size: 0.875rem;
+            border-radius: 0.25rem;
+        }
+        .bg-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .bg-success {
+            background-color: #28a745;
+            color: #fff;
+        }
+        .bg-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+    </style>
 @endsection
 
 @section('content')
@@ -23,6 +43,7 @@
                         <th>Total Harga</th>
                         <th>Diskon</th>
                         <th>Total Bayar</th>
+                        <th>Status</th>
                         <th>Kasir</th>
                         <th width="15%"><i class="fa fa-cog"></i></th>
                     </thead>
@@ -54,6 +75,15 @@
                 {data: 'total_harga'},
                 {data: 'diskon'},
                 {data: 'bayar'},
+                {data: 'status', render: function(data, type, row) {
+                    if (data === 'pending') {
+                        return '<span class="badge bg-warning text-dark">' + data + '</span>';
+                    } else if (data === 'success') {
+                        return '<span class="badge bg-success">' + data + '</span>';
+                    } else {
+                        return '<span class="badge bg-danger">' + data + '</span>';
+                    }
+                }},
                 {data: 'kasir'},
                 {data: 'aksi', searchable: false, sortable: false},
             ]
